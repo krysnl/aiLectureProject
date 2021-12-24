@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        BufferedReader bufReader = new BufferedReader(new FileReader("src/mazeinput.txt"));
+        BufferedReader bufReader = new BufferedReader(new FileReader("mazeinput.txt"));
         String[] borders = bufReader.readLine().split(",");
         State[][] maze = new State[Integer.parseInt(borders[0])][Integer.parseInt(borders[1])];
         int startX ;
@@ -28,7 +28,7 @@ public class Main {
     }
 
     public static State createState(String[] str, State[][] maze,int i,int j){
-        ArrayList<State> adjacencyList = new ArrayList<State>();
+        ArrayList<State> adjacencyList = new ArrayList<>();
         if (str[0].equals("0")) {
             adjacencyList.add(maze[i-1][j]);
         }
