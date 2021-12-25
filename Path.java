@@ -1,12 +1,13 @@
 public class Path {
     private String path;
+    private int cost;
+    private boolean isGoal;
 
     public Path(String path, int cost) {
         this.path = path;
         this.cost = cost;
+        this.isGoal = false;
     }
-
-    private int cost;
 
     public String getPath() {
         return path;
@@ -22,5 +23,13 @@ public class Path {
 
     public void setCost(int cost) {
         this.cost = cost;
+    }
+
+    public boolean isGoal() {
+        return isGoal;
+    }
+
+    public void setGoal(boolean goal) {
+        isGoal = goal;
     }
 }

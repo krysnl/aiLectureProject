@@ -5,7 +5,13 @@ public class State {
     private ArrayList<int[]> adjacencyList;
     private StateType stateType;
     private int cost;
+    private int totalCost;
 
+    public boolean isGoal() {
+        return isGoal;
+    }
+
+    private boolean isGoal;
     private int x;
     private int y;
 
@@ -14,6 +20,7 @@ public class State {
         converter(stateType);
         this.x = x;
         this.y = y;
+        this.totalCost = 0;
     }
 
     private void converter (String stateType){
@@ -21,18 +28,22 @@ public class State {
             case "S" -> {
                 this.stateType = StateType.S;
                 this.cost = 1;
+                this.isGoal = false;
             }
             case "G" -> {
                 this.stateType = StateType.G;
                 this.cost = 1;
+                this.isGoal = true;
             }
             case "T" -> {
                 this.stateType = StateType.T;
                 this.cost = 10;
+                this.isGoal = false;
             }
             default -> {
                 this.stateType = StateType.E;
                 this.cost = 1;
+                this.isGoal = false;
             }
         }
     }
@@ -68,5 +79,13 @@ public class State {
                 ", stateType=" + stateType +
                 ", cost=" + cost +
                 '}';
+    }
+
+    public int getTotalCost() {
+        return totalCost;
+    }
+
+    public void setTotalCost(int totalCost) {
+        this.totalCost = totalCost;
     }
 }
