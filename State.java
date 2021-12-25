@@ -2,14 +2,18 @@ import java.util.ArrayList;
 
 public class State {
 
-    private ArrayList<State> adjacencyList;
+    private ArrayList<int[]> adjacencyList;
     private StateType stateType;
     private int cost;
 
-    public State(ArrayList<State> adjacencyList, String stateType ) {
-        System.out.println(adjacencyList);
+    private int x;
+    private int y;
+
+    public State(ArrayList<int[]> adjacencyList, String stateType, int x , int y ) {
         this.adjacencyList = adjacencyList;
         converter(stateType);
+        this.x = x;
+        this.y = y;
     }
 
     private void converter (String stateType){
@@ -24,7 +28,7 @@ public class State {
             }
             case "T" -> {
                 this.stateType = StateType.T;
-                this.cost = -8;
+                this.cost = 10;
             }
             default -> {
                 this.stateType = StateType.E;
@@ -42,10 +46,21 @@ public class State {
         return cost;
     }
 
-    public ArrayList<State> getAdjacencyList() {
+    public ArrayList<int[]> getAdjacencyList() {
         return adjacencyList;
     }
 
+    public void setAdjacencyList(ArrayList<int[]> adjacencyList) {
+        this.adjacencyList = adjacencyList;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
     @Override
     public String toString() {
         return "State{" +
