@@ -6,6 +6,7 @@ public class State {
     private StateType stateType;
     private int cost;
     private int totalCost;
+    private int manhattanDistance;
 
     public boolean isGoal() {
         return isGoal;
@@ -21,6 +22,7 @@ public class State {
         this.x = x;
         this.y = y;
         this.totalCost = 0;
+        this.manhattanDistance = 0;
     }
 
     private void converter (String stateType){
@@ -88,4 +90,13 @@ public class State {
     public void setTotalCost(int totalCost) {
         this.totalCost = totalCost;
     }
+
+    public int getManhattanDistance() {
+        return manhattanDistance;
+    }
+
+    public void setManhattanDistance(int manhattanDistance) {
+        this.manhattanDistance = manhattanDistance;
+    }
+
 }
