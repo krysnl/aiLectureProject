@@ -39,7 +39,7 @@ public class State {
             }
             case "T" -> {
                 this.stateType = StateType.T;
-                this.cost = 10;
+                this.cost = 11;
                 this.isGoal = false;
             }
             default -> {
