@@ -7,6 +7,7 @@ public class State {
     private int cost;
     private int totalCost;
     private int manhattanDistance;
+    private int depth;
 
     public boolean isGoal() {
         return isGoal;
@@ -23,6 +24,7 @@ public class State {
         this.y = y;
         this.totalCost = 0;
         this.manhattanDistance = 0;
+        this.depth = 0;
     }
 
     private void converter (String stateType){
@@ -89,6 +91,14 @@ public class State {
 
     public void setTotalCost(int totalCost) {
         this.totalCost = totalCost;
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public void setDepth(int depth) {
+        this.depth = depth;
     }
 
     public int getManhattanDistance() {

@@ -10,6 +10,9 @@ public class Main {
     static int startY;
     static State[][] maze;
     static ArrayList<State> goalStates;
+    static int visitCounter ;
+    static boolean[][] isExplored;
+    static int maxFrontier;
 
     public static void main(String[] args) throws IOException {
         createMaze();
@@ -63,22 +66,18 @@ public class Main {
         System.out.println("\nDepth First Search ");
         Stack<State> stack = new Stack<>();
         Stack<Path> pathList = new Stack<>();
-        int visitCounter = 0;
-        boolean[][] isExplored = new boolean[mazeX][mazeY];
+        visitCounter = 0;
+        isExplored = new boolean[mazeX][mazeY];
         isExplored[startX][startY] = true;
         stack.push(maze[startX][startY]);
-        int maxFrontier = 0;
-        pathList.push(new Path("(" + (startX + 1) + "," + (startY + 1) + ")", 0));
+        maxFrontier = 0;
+        pathList.push(new Path(maze[startX][startY], 0));
         while (!stack.isEmpty()) {
             maxFrontier = Math.max(maxFrontier,stack.size());
             State s = stack.pop();
             visitCounter++;
             if (s.isGoal()) {
-                System.out.println("Cost of solution => "+ pathList.peek().getCost());
-                System.out.println("Number of expanded nodes => "+ visitCounter);
-                System.out.println("Maximum size of frontier => "+maxFrontier);
-                System.out.println("Maximum size of explored set => "+visitedCount(isExplored));
-                System.out.println("Path of solution => "+pathList.peek().getPath());
+                printResult(pathList.peek().getCost(),pathList.peek().getPath());
                 return;
             }
             Path oldPath = pathList.pop();
@@ -86,7 +85,9 @@ public class Main {
                 if (!isExplored[ints[0]][ints[1]]) {
                     stack.push(maze[ints[0]][ints[1]]);
                     int cost = oldPath.getCost() + s.getCost();
-                    pathList.push(new Path(oldPath.getPath() + " -> (" + (ints[0] + 1) + "," + (ints[1] + 1) + ")", cost));
+                    ArrayList<State> path = (ArrayList<State>) oldPath.getPath().clone();
+                    path.add(maze[ints[0]][ints[1]]);
+                    pathList.push(new Path(path, cost));
                     isExplored[ints[0]][ints[1]] = true;
                 }
             }
@@ -97,22 +98,18 @@ public class Main {
         System.out.println("\nBreadth First Search ");
         Queue<State> queue = new LinkedList<>();
         Queue<Path> pathList = new LinkedList<>();
-        int visitCounter = 0;
-        boolean[][] isExplored = new boolean[mazeX][mazeY];
+        visitCounter = 0;
+        isExplored = new boolean[mazeX][mazeY];
         isExplored[startX][startY] = true;
         queue.add(maze[startX][startY]);
-        int maxFrontier = 0;
-        pathList.add(new Path("(" + (startX + 1) + "," + (startY + 1) + ")", 0));
+        maxFrontier = 0;
+        pathList.add(new Path(maze[startX][startY], 0));
         while (!queue.isEmpty()) {
             maxFrontier = Math.max(maxFrontier, queue.size());
             State s = queue.poll();
             visitCounter++;
             if (s.isGoal()) {
-                System.out.println("Cost of solution => "+ pathList.peek().getCost());
-                System.out.println("Number of expanded nodes => "+ visitCounter);
-                System.out.println("Maximum size of frontier => "+maxFrontier);
-                System.out.println("Maximum size of explored set => "+visitedCount(isExplored));
-                System.out.println("Path of solution => "+pathList.peek().getPath());
+                printResult(pathList.peek().getCost(),pathList.peek().getPath());
                 return;
             }
             Path oldPath = pathList.poll();
@@ -120,7 +117,9 @@ public class Main {
                 if (!isExplored[ints[0]][ints[1]]) {
                     queue.add(maze[ints[0]][ints[1]]);
                     int cost = oldPath.getCost() + s.getCost();
-                    pathList.add(new Path(oldPath.getPath() + " -> (" + (ints[0] + 1) + "," + (ints[1] + 1) + ")", cost));
+                    ArrayList<State> path = (ArrayList<State>) oldPath.getPath().clone();
+                    path.add(maze[ints[0]][ints[1]]);
+                    pathList.add(new Path(path, cost));
                     isExplored[ints[0]][ints[1]] = true;
                 }
             }
@@ -129,72 +128,63 @@ public class Main {
 
     public static void iterativeDeepening() {
         System.out.println("\nIterative Deepening ");
+        int maxDepth = 1;
+        isExplored = new boolean[mazeX][mazeY];
+        while(!depthLimitedSearch(maxDepth)){
+            maxDepth++;
+        }
+    }
+
+    public static boolean depthLimitedSearch(int maxDepth){
         Stack<State> stack = new Stack<>();
         Stack<Path> pathList = new Stack<>();
-        Stack<State> stack2 = new Stack<>();
-        Stack<Path> pathList2 = new Stack<>();
-        int visitCounter = 0;
-        boolean[][] isExplored = new boolean[mazeX][mazeY];
-        int depth = 0;
-        int maxDepth = 0;
+        isExplored[startX][startY] = true;
+        boolean[][] isExpanded = new boolean[mazeX][mazeY];
         stack.push(maze[startX][startY]);
-        int maxFrontier = stack.size();
-        pathList.push(new Path("(" + (startX + 1) + "," + (startY + 1) + ")", 0));
-        while (true) {
-            maxDepth++;
-            while (!stack.isEmpty()) {
-                maxFrontier = Math.max(maxFrontier, stack.size());
-                State s = stack.pop();
-                isExplored[s.getX()][s.getY()] = true;
-                visitCounter++;
-                if (s.isGoal()) {
-                    System.out.println("Cost of solution => "+ pathList.peek().getCost());
-                    System.out.println("Number of expanded nodes => "+visitCounter);
-                    System.out.println("Maximum size of frontier => "+maxFrontier);
-                    System.out.println("Maximum size of explored set => "+visitedCount(isExplored));
-                    System.out.println("Path of solution => "+pathList.peek().getPath());
-                    return;
-                }
-                Path oldPath = pathList.pop();
-                if (depth > maxDepth) {
-                    stack2.add(s);
-                    pathList2.add(oldPath);
-                    continue;
-                }
-                for (int[] ints : s.getAdjacencyList()) {
-                    if (!isExplored[ints[0]][ints[1]]) {
-                        stack2.push(maze[ints[0]][ints[1]]);
-                        int cost = oldPath.getCost() + s.getCost();
-                        pathList2.push(new Path(oldPath.getPath() + " -> (" + (ints[0] + 1) + "," + (ints[1] + 1) + ")", cost));
-                    }
+        maxFrontier = 0;
+        pathList.push(new Path(maze[startX][startY], 0));
+        while (!stack.isEmpty()) {
+            maxFrontier = Math.max(maxFrontier,stack.size());
+            State s = stack.pop();
+            Path oldPath = pathList.pop();
+            if(s.getDepth() >= maxDepth) continue;
+            isExplored[s.getX()][s.getY()] = true;
+            isExpanded[s.getX()][s.getY()] = true;
+            if (s.isGoal()) {
+                visitCounter = visitedCount(isExpanded);
+                printResult(oldPath.getCost(),oldPath.getPath());
+                return true;
+            }
+            for (int[] ints : s.getAdjacencyList()) {
+                if (!oldPath.getPath().contains(maze[ints[0]][ints[1]])) {
+                    maze[ints[0]][ints[1]].setDepth(s.getDepth()+1);
+                    stack.push(maze[ints[0]][ints[1]]);
+                    int cost = oldPath.getCost() + s.getCost();
+                    ArrayList<State> path = (ArrayList<State>) oldPath.getPath().clone();
+                    path.add(maze[ints[0]][ints[1]]);
+                    pathList.push(new Path(path, cost));
                 }
             }
-            depth++;
-            stack = (Stack<State>) stack2.clone();
-            pathList = (Stack<Path>)pathList2.clone();
         }
+        return false;
     }
 
     public static void uniformCostSearch() {
         System.out.println("\nUniform Cost Search ");
         PriorityQueue<State> queue = new PriorityQueue<State>(new MyComparator());
         PriorityQueue<Path> pathList = new PriorityQueue<Path>(new MyComparatorPath());
-        int visitCounter = 0;
-        boolean[][] isExplored = new boolean[mazeX][mazeY];
+        visitCounter = 0;
+        isExplored = new boolean[mazeX][mazeY];
         queue.add(maze[startX][startY]);
-        int maxFrontier = queue.size();
-        pathList.add(new Path("(" + (startX + 1) + "," + (startY + 1) + ")", 0));
+        maxFrontier = queue.size();
+        pathList.add(new Path(maze[startX][startY], 0));
         while (!queue.isEmpty()) {
             maxFrontier = Math.max(maxFrontier, queue.size());
             State s = queue.poll();
             Path oldPath = pathList.poll();
             visitCounter++;
             if (s.isGoal()) {
-                System.out.println("Cost of solution => "+ oldPath.getCost());
-                System.out.println("Number of expanded nodes => "+ visitCounter);
-                System.out.println("Maximum size of frontier => "+maxFrontier);
-                System.out.println("Maximum size of explored set => "+visitedCount(isExplored));
-                System.out.println("Path of solution => "+oldPath.getPath());
+                printResult(oldPath.getCost(),oldPath.getPath());
                 return;
             }
             for (int[] ints : s.getAdjacencyList()) {
@@ -203,7 +193,9 @@ public class Main {
                     State nextState = maze[ints[0]][ints[1]];
                     nextState.setTotalCost(cost);
                     queue.add(nextState);
-                    pathList.add(new Path(oldPath.getPath() + " -> (" + (ints[0] + 1) + "," + (ints[1] + 1) + ")", cost));
+                    ArrayList<State> path = (ArrayList<State>) oldPath.getPath().clone();
+                    path.add(maze[ints[0]][ints[1]]);
+                    pathList.add(new Path(path, cost));
                     isExplored[ints[0]][ints[1]] = true;
                 }
             }
@@ -214,24 +206,20 @@ public class Main {
         System.out.println("\nGreedy Best First Search ");
         PriorityQueue<State> queue = new PriorityQueue<State>(new MyComparatorManhattan());
         PriorityQueue<Path> pathList = new PriorityQueue<Path>(new MyComparatorManhattanPath());
-        int visitCounter = 0;
-        boolean[][] isExplored = new boolean[mazeX][mazeY];
+        visitCounter = 0;
+        isExplored = new boolean[mazeX][mazeY];
         State startState = maze[startX][startY];
         queue.add(startState);
-        int maxFrontier = queue.size();
+        maxFrontier = queue.size();
         startState.setManhattanDistance(manhattanDistanceCalculator(startState));
-        pathList.add(new Path("(" + (startX + 1) + "," + (startY + 1) + ")", 0, startState.getManhattanDistance()));
+        pathList.add(new Path(startState, 0, startState.getManhattanDistance()));
         while (!queue.isEmpty()) {
             maxFrontier = Math.max(maxFrontier, queue.size());
             State s = queue.poll();
             Path oldPath = pathList.poll();
             visitCounter++;
             if (s.isGoal()) {
-                System.out.println("Cost of solution => "+ oldPath.getCost());
-                System.out.println("Number of expanded nodes => "+visitCounter);
-                System.out.println("Maximum size of frontier => "+maxFrontier);
-                System.out.println("Maximum size of explored set => "+visitedCount(isExplored));
-                System.out.println("Path of solution => "+oldPath.getPath());
+                printResult(oldPath.getCost(),oldPath.getPath());
                 return;
             }
             for (int[] ints : s.getAdjacencyList()) {
@@ -241,7 +229,9 @@ public class Main {
                     nextState.setManhattanDistance(manhattanDistanceCalculator(nextState));
                     nextState.setTotalCost(cost);
                     queue.add(nextState);
-                    pathList.add(new Path(oldPath.getPath() + " -> (" + (ints[0] + 1) + "," + (ints[1] + 1) + ")", cost, nextState.getManhattanDistance()));
+                    ArrayList<State> path = (ArrayList<State>) oldPath.getPath().clone();
+                    path.add(maze[ints[0]][ints[1]]);
+                    pathList.add(new Path(path, cost));
                     isExplored[ints[0]][ints[1]] = true;
                 }
             }
@@ -252,24 +242,20 @@ public class Main {
         System.out.println("\nA* Heuristic Search");
         PriorityQueue<State> queue = new PriorityQueue<State>(new MyComparatorAStar());
         PriorityQueue<Path> pathList = new PriorityQueue<Path>(new MyComparatorAStarPath());
-        int visitCounter = 0;
-        boolean[][] isExplored = new boolean[mazeX][mazeY];
+        visitCounter = 0;
+        isExplored = new boolean[mazeX][mazeY];
         State startState = maze[startX][startY];
         queue.add(startState);
-        int maxFrontier = queue.size();
+        maxFrontier = queue.size();
         startState.setManhattanDistance(manhattanDistanceCalculator(startState));
-        pathList.add(new Path("(" + (startX + 1) + "," + (startY + 1) + ")", 0, startState.getManhattanDistance()));
+        pathList.add(new Path(startState, 0, startState.getManhattanDistance()));
         while (!queue.isEmpty()) {
             maxFrontier = Math.max(maxFrontier, queue.size());
             State s = queue.poll();
             Path oldPath = pathList.poll();
             visitCounter++;
             if (s.isGoal()) {
-                System.out.println("Cost of solution => "+ oldPath.getCost());
-                System.out.println("Number of expanded nodes => "+visitCounter);
-                System.out.println("Maximum size of frontier => "+maxFrontier);
-                System.out.println("Maximum size of explored set => "+visitedCount(isExplored));
-                System.out.println("Path of solution => "+oldPath.getPath());
+                printResult(oldPath.getCost(),oldPath.getPath());
                 return;
             }
             for (int[] ints : s.getAdjacencyList()) {
@@ -279,7 +265,9 @@ public class Main {
                     nextState.setManhattanDistance(manhattanDistanceCalculator(nextState));
                     nextState.setTotalCost(cost);
                     queue.add(nextState);
-                    pathList.add(new Path(oldPath.getPath() + " -> (" + (ints[0] + 1) + "," + (ints[1] + 1) + ")", cost, nextState.getManhattanDistance()));
+                    ArrayList<State> path = (ArrayList<State>) oldPath.getPath().clone();
+                    path.add(maze[ints[0]][ints[1]]);
+                    pathList.add(new Path(path, cost));
                     isExplored[ints[0]][ints[1]] = true;
                 }
             }
@@ -306,4 +294,20 @@ public class Main {
         }
         return visitedCount;
     }
+
+    public static void printResult(int cost,ArrayList<State> path ){
+        System.out.println("Cost of solution => "+ cost);
+        System.out.println("Number of expanded nodes => "+ visitCounter);
+        System.out.println("Maximum size of frontier => "+maxFrontier);
+        System.out.println("Maximum size of explored set => "+visitedCount(isExplored));
+        System.out.print("Path of solution => ");
+        for (int i = 0 ; i<path.size()-1 ; i++) {
+            State state = path.get(i);
+            System.out.print("("+(state.getY()+1) + "," + (state.getX()+1) +") - ");
+        }
+        State state = path.get(path.size()-1);
+        System.out.println("("+(state.getY()+1) + "," + (state.getX()+1) +") ");
+
+    }
+
 }
