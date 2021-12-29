@@ -171,8 +171,8 @@ public class Main {
 
     public static void uniformCostSearch() {
         System.out.println("\nUniform Cost Search ");
-        PriorityQueue<State> queue = new PriorityQueue<State>(new MyComparator());
-        PriorityQueue<Path> pathList = new PriorityQueue<Path>(new MyComparatorPath());
+        PriorityQueue<State> queue = new PriorityQueue<>(new MyComparator());
+        PriorityQueue<Path> pathList = new PriorityQueue<>(new MyComparatorPath());
         visitCounter = 0;
         isExplored = new boolean[mazeX][mazeY];
         queue.add(maze[startX][startY]);
@@ -204,8 +204,8 @@ public class Main {
 
     public static void greedyBestFirstSearch() {
         System.out.println("\nGreedy Best First Search ");
-        PriorityQueue<State> queue = new PriorityQueue<State>(new MyComparatorManhattan());
-        PriorityQueue<Path> pathList = new PriorityQueue<Path>(new MyComparatorManhattanPath());
+        PriorityQueue<State> queue = new PriorityQueue<>(new MyComparatorManhattan());
+        PriorityQueue<Path> pathList = new PriorityQueue<>(new MyComparatorManhattanPath());
         visitCounter = 0;
         isExplored = new boolean[mazeX][mazeY];
         State startState = maze[startX][startY];
@@ -230,8 +230,8 @@ public class Main {
                     nextState.setTotalCost(cost);
                     queue.add(nextState);
                     ArrayList<State> path = (ArrayList<State>) oldPath.getPath().clone();
-                    path.add(maze[ints[0]][ints[1]]);
-                    pathList.add(new Path(path, cost));
+                    path.add(nextState);
+                    pathList.add(new Path(path, cost, nextState.getManhattanDistance()));
                     isExplored[ints[0]][ints[1]] = true;
                 }
             }
@@ -240,8 +240,8 @@ public class Main {
 
     public static void aStarHeuristicSearch() {
         System.out.println("\nA* Heuristic Search");
-        PriorityQueue<State> queue = new PriorityQueue<State>(new MyComparatorAStar());
-        PriorityQueue<Path> pathList = new PriorityQueue<Path>(new MyComparatorAStarPath());
+        PriorityQueue<State> queue = new PriorityQueue<>(new MyComparatorAStar());
+        PriorityQueue<Path> pathList = new PriorityQueue<>(new MyComparatorAStarPath());
         visitCounter = 0;
         isExplored = new boolean[mazeX][mazeY];
         State startState = maze[startX][startY];
@@ -266,8 +266,8 @@ public class Main {
                     nextState.setTotalCost(cost);
                     queue.add(nextState);
                     ArrayList<State> path = (ArrayList<State>) oldPath.getPath().clone();
-                    path.add(maze[ints[0]][ints[1]]);
-                    pathList.add(new Path(path, cost));
+                    path.add(nextState);
+                    pathList.add(new Path(path, cost, nextState.getManhattanDistance()));
                     isExplored[ints[0]][ints[1]] = true;
                 }
             }
